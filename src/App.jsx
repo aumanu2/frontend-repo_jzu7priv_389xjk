@@ -1,28 +1,56 @@
-import { useState } from 'react'
+import React, { useState } from 'react';
+import Sidebar from './components/Sidebar';
+import Topbar from './components/Topbar';
+import Dashboard from './components/Dashboard';
+import { LoginScreen, ProjectView, AnalyticsView, SettingsLists, ProfileView } from './components/Screens';
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
+  const [active, setActive] = useState('dashboard');
+  const [isAuthed, setIsAuthed] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  const [search, setSearch] = useState('');
+
+  const renderScreen = () => {
+    if (!isAuthed) return <LoginScreen onLogin={() => setIsAuthed(true)} />;
+    switch (active) {
+      case 'dashboard':
+        return <Dashboard onOpenProject={() => setActive('projects')} />;
+      case 'projects':
+        return <ProjectView />;
+      case 'tasks':
+        return <ProjectView />;
+      case 'analytics':
+        return <AnalyticsView />;
+      case 'settings':
+        return <SettingsLists />;
+      case 'profile':
+        return <ProfileView />;
+      case 'timesheets':
+        return <ProjectView />;
+      default:
+        return <Dashboard />;
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-lg">
-        <h1 className="text-3xl font-bold text-gray-800 mb-4">
-          Vibe Coding Platform
-        </h1>
-        <p className="text-gray-600 mb-6">
-          Your AI-powered development environment
-        </p>
-        <div className="text-center">
-          <button
-            onClick={() => setCount(count + 1)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-          >
-            Count is {count}
-          </button>
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <div className="flex">
+        <Sidebar active={active} onChange={setActive} collapsed={collapsed} />
+        <div className="flex-1 min-h-screen flex flex-col">
+          <Topbar onSearch={setSearch} />
+          <div className="p-4 md:p-6">
+            <div className="mb-3 flex items-center justify-between">
+              <h1 className="text-xl font-semibold capitalize">{active}</h1>
+              <button onClick={() => setCollapsed(v => !v)} className="px-3 py-1.5 text-sm rounded-md border border-slate-200 bg-white hover:bg-slate-50">
+                {collapsed ? 'Expand Menu' : 'Collapse Menu'}
+              </button>
+            </div>
+            <div className="rounded-2xl overflow-hidden border border-slate-200 bg-white/70">
+              {renderScreen()}
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
-
-export default App
